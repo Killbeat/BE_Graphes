@@ -51,9 +51,7 @@ public class Path {
         	if (rightArcs.isEmpty()) {
         		throw new IllegalArgumentException("Invalid Path");
         	}
-        	
-        	System.out.println(rightArcs.size());
-        	
+
         	double minTravelTime = rightArcs.get(0).getMinimumTravelTime();
         	int fastestArcIndex = 0;
         	
@@ -81,8 +79,6 @@ public class Path {
      * 
      * @throws IllegalArgumentException If the list of nodes is not valid, i.e. two
      *         consecutive nodes in the list are not connected in the graph.
-     * 
-     * @deprecated Need to be implemented.
      */
     public static Path createShortestPathFromNodes(Graph graph, List<Node> nodes)
             throws IllegalArgumentException {
@@ -106,8 +102,6 @@ public class Path {
         	if (rightArcs.isEmpty()) {
         		throw new IllegalArgumentException("Invalid Path");
         	}
-        	
-        	System.out.println(rightArcs.size());
         	
         	double minLength = rightArcs.get(0).getLength();
         	int shortestArcIndex = 0;
