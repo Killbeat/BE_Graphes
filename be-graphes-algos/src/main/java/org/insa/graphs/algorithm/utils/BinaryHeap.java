@@ -83,6 +83,15 @@ public class BinaryHeap<E extends Comparable<E>> implements PriorityQueue<E> {
 
         this.arraySet(index, x);
     }
+    
+    public void edit(E target, E newVal) {
+    	for (E e : this.array) {
+    		if (target == e) {
+    			e = newVal;    	
+    			break;
+    		}
+    	}
+    }
 
     /**
      * Internal method to percolate down in the heap.
