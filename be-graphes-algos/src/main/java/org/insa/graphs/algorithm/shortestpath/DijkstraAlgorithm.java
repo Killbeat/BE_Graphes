@@ -22,10 +22,10 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         ShortestPathSolution solution = null;
         Graph graph = data.getGraph();
         int nbNodes = graph.size();
-        ArrayList<Arc> solutionArcs = new ArrayList<Arc>();        
+        ArrayList<Arc> solutionArcs = new ArrayList<Arc>();
         BinaryHeap<Label> heap = new BinaryHeap<Label>();
         Label[] labelList = new Label[nbNodes];
-        
+        /*
         // initialize heap and labelList
         for (Node node : graph.getNodes()) {
         	if (node != data.getOrigin()) {
@@ -38,13 +38,36 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		labelList[node.getId()] = l;
         	}
         }
+        */
         
-        while (!heap.isEmpty()) {
+        Label l = new Label(data.getOrigin(), true, 0, null);
+        labelList[data.getOrigin().getId()] = l;
+        heap.insert(l);
+        notifyOriginProcessed(data.getOrigin());
+        
+        while (!heap.isEmpty() || !labelList[data.getDestination().getId()].isCostKnown()) {
         	Node currentNode = heap.deleteMin().getNode();
+        	
+        	labelList[currentNode.getId()].setCostKnown(true);
+        	notifyNodeMarked(currentNode);
+        	
         	for (Arc arc : currentNode.getSuccessors()) {
-        		if (labelList[arc.getDestination().getId()].getCost() > labelList[currentNode.getId()].getCost() + arc.getLength()) {
-        			labelList[arc.getDestination().getId()].setCost(labelList[currentNode.getId()].getCost() + arc.getLength());
-        			labelList[arc.getDestination().getId()].setPredecessor(arc);
+        		
+        		if(labelList[arc.getDestination().getId()] == null) 
+        		{
+        			Label x = new Label(arc.getDestination(), false, labelList[currentNode.getId()].getCost() + arc.getLength(), arc);
+        			heap.insert(x);
+        			labelList[arc.getDestination().getId()] = x;
+        			notifyNodeReached(arc.getDestination());
+        		}
+        		else 
+        		{
+        			if (labelList[currentNode.getId()].getCost() + arc.getLength() < labelList[arc.getDestination().getId()].getCost()) {
+        				heap.remove(labelList[arc.getDestination().getId()]);
+        				labelList[arc.getDestination().getId()].setCost(labelList[currentNode.getId()].getCost() + arc.getLength());
+            			labelList[arc.getDestination().getId()].setPredecessor(arc);
+            			heap.insert(labelList[arc.getDestination().getId()]);
+        			}
         		}
         	}
         }
@@ -53,6 +76,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         if (labelList[data.getDestination().getId()].getPredecessor() == null) {
         	return new ShortestPathSolution(data, Status.INFEASIBLE);
         }
+        
+        notifyDestinationReached(data.getDestination());
         
         Arc arc = labelList[data.getDestination().getId()].getPredecessor();
         while (arc != null) {

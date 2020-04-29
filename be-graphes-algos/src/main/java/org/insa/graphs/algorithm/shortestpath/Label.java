@@ -13,7 +13,7 @@ class Label implements Comparable<Label> {
 	// precedent arc corresponding to shortest path from start node
 	private Arc predecessor;
 	
-	public Label(Node sc, boolean m, int c, Arc p) {
+	public Label(Node sc, boolean m, float c, Arc p) {
 		this.currentNode = sc;
 		this.costKnown = m;
 		this.cost = c;
