@@ -9,7 +9,7 @@ class Label implements Comparable<Label> {
 	// is the min cost known by the algorithm already ?
 	private boolean costKnown;
 	// current cost from start node to this one
-	private float cost;
+	protected float cost;
 	// precedent arc corresponding to shortest path from start node
 	private Arc predecessor;
 	
@@ -50,11 +50,15 @@ class Label implements Comparable<Label> {
 		return this.predecessor;
 	}
 	
+	public float getTotalCost() {
+		return this.cost;
+	}
+	
 	@Override
 	public int compareTo(Label otherLabel) {
-		if (this.cost < otherLabel.cost) {
+		if (this.getTotalCost() < otherLabel.getTotalCost()) {
 			return -1;
-		} else if (this.cost == otherLabel.cost) {
+		} else if (this.getTotalCost() == otherLabel.getTotalCost()) {
 			return 0;
 		} else {
 			return 1;

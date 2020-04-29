@@ -14,8 +14,12 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
     public DijkstraAlgorithm(ShortestPathData data) {
         super(data);
-    }
+    }      
 
+    protected Label CreateLabel(Node n, boolean costknown, float cost, Arc parent, Node dest) {
+    	return new Label(n, costknown, cost, parent);
+    }
+    
     @Override
     protected ShortestPathSolution doRun() {
         final ShortestPathData data = getInputData();
@@ -25,27 +29,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         ArrayList<Arc> solutionArcs = new ArrayList<Arc>();
         BinaryHeap<Label> heap = new BinaryHeap<Label>();
         Label[] labelList = new Label[nbNodes];
-        /*
-        // initialize heap and labelList
-        for (Node node : graph.getNodes()) {
-        	if (node != data.getOrigin()) {
-        		Label l = new Label(node, false, 1000000, null);
-            	heap.insert(l);
-            	labelList[node.getId()] = l;
-        	} else {
-        		Label l = new Label(node, true, 0, null);
-        		heap.insert(l);
-        		labelList[node.getId()] = l;
-        	}
-        }
-        */
         
-        Label l = new Label(data.getOrigin(), true, 0, null);
+        Label l = this.CreateLabel(data.getOrigin(), true, 0, null, data.getDestination());
         labelList[data.getOrigin().getId()] = l;
         heap.insert(l);
         notifyOriginProcessed(data.getOrigin());
         
-        while (!heap.isEmpty() || !labelList[data.getDestination().getId()].isCostKnown()) {
+        while (!heap.isEmpty()) {
         	Node currentNode = heap.deleteMin().getNode();
         	
         	labelList[currentNode.getId()].setCostKnown(true);
@@ -54,8 +44,8 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	for (Arc arc : currentNode.getSuccessors()) {
         		
         		if(labelList[arc.getDestination().getId()] == null) 
-        		{
-        			Label x = new Label(arc.getDestination(), false, labelList[currentNode.getId()].getCost() + arc.getLength(), arc);
+        		{        			
+        			Label x = this.CreateLabel(arc.getDestination(), false, labelList[currentNode.getId()].getCost() + (float)data.getCost(arc), arc, data.getDestination());
         			heap.insert(x);
         			labelList[arc.getDestination().getId()] = x;
         			notifyNodeReached(arc.getDestination());
@@ -64,12 +54,18 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         		{
         			if (labelList[currentNode.getId()].getCost() + arc.getLength() < labelList[arc.getDestination().getId()].getCost()) {
         				heap.remove(labelList[arc.getDestination().getId()]);
-        				labelList[arc.getDestination().getId()].setCost(labelList[currentNode.getId()].getCost() + arc.getLength());
+        				labelList[arc.getDestination().getId()].setCost(labelList[currentNode.getId()].getCost() +  (float)data.getCost(arc));
             			labelList[arc.getDestination().getId()].setPredecessor(arc);
             			heap.insert(labelList[arc.getDestination().getId()]);
         			}
         		}
         	}
+        	
+        	if (labelList[data.getDestination().getId()] != null)
+        		if (labelList[data.getDestination().getId()].isCostKnown())
+        			break;
+        	
+        	
         }
     
         //construct solution
@@ -87,7 +83,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         
         Collections.reverse(solutionArcs);
                 
-        solution = new ShortestPathSolution(data, Status.FEASIBLE, new Path(graph, solutionArcs));
+        solution = new ShortestPathSolution(data, Status.OPTIMAL, new Path(graph, solutionArcs));
                 
         return solution;
     }
