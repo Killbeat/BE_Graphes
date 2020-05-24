@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.junit.Test;
+import org.insa.graphs.algorithm.AbstractSolution;
 import org.insa.graphs.algorithm.ArcInspectorFactory;
 import org.insa.graphs.model.Graph;
 import org.insa.graphs.model.Path;
@@ -27,6 +28,9 @@ public class DijkstraAlgorithmTest {
 	private static GraphReader reader2;
 	private static Graph graph2;
 	
+	private static String map3Name;
+	private static GraphReader reader3;
+	private static Graph graph3;
 	
 	@BeforeClass
 	public static void initAll() throws IOException {
@@ -43,7 +47,14 @@ public class DijkstraAlgorithmTest {
                 new DataInputStream(new BufferedInputStream(new FileInputStream(map2Name))));
 
         graph2 = reader2.read();
+        
+        map3Name = "../Maps/toulouse.mapgr";
 
+        reader3 = new BinaryGraphReader(
+                new DataInputStream(new BufferedInputStream(new FileInputStream(map3Name))));
+
+        graph3 = reader3.read();
+        
 	}
 	
 	@Test
@@ -79,7 +90,7 @@ public class DijkstraAlgorithmTest {
 	}
 	
 	@Test
-	public void scenario2shortest() {
+	public void inverseScenario1shortest() {
 		ShortestPathData spd = new ShortestPathData(graph2, graph2.get(659), graph2.get(195), ArcInspectorFactory.getAllFilters().get(0));
 		ShortestPathSolution dsps = new DijkstraAlgorithm(spd).doRun();
 		ShortestPathSolution assps = new AStarAlgorithm(spd).doRun();
@@ -91,7 +102,7 @@ public class DijkstraAlgorithmTest {
 	}
 	
 	@Test
-	public void scenario2fastest() {
+	public void inverseScenario1fastest() {
 		ShortestPathData spd = new ShortestPathData(graph2, graph2.get(659), graph2.get(195), ArcInspectorFactory.getAllFilters().get(2));
 		ShortestPathSolution dsps = new DijkstraAlgorithm(spd).doRun();
 		ShortestPathSolution assps = new AStarAlgorithm(spd).doRun();
@@ -103,7 +114,7 @@ public class DijkstraAlgorithmTest {
 	}
 	
 	@Test
-	public void testDestinationEqualsOrigin() {
+	public void testDestinationEqualsOriginLength() {
 		ShortestPathData spd = new ShortestPathData(graph2, graph2.get(195), graph2.get(195), ArcInspectorFactory.getAllFilters().get(0));
 		ShortestPathSolution dsps = new DijkstraAlgorithm(spd).doRun();
 		ShortestPathSolution assps = new AStarAlgorithm(spd).doRun();
@@ -114,4 +125,37 @@ public class DijkstraAlgorithmTest {
 		assertTrue(dsolution == null && assolution == null && bfsolution == null);
 	}
 	
+	@Test
+	public void testDestinationEqualsOriginTime() {
+		ShortestPathData spd = new ShortestPathData(graph2, graph2.get(195), graph2.get(195), ArcInspectorFactory.getAllFilters().get(2));
+		ShortestPathSolution dsps = new DijkstraAlgorithm(spd).doRun();
+		ShortestPathSolution assps = new AStarAlgorithm(spd).doRun();
+		ShortestPathSolution bfsps = new BellmanFordAlgorithm(spd).doRun();
+		Path dsolution = dsps.getPath();
+		Path assolution = assps.getPath();
+		Path bfsolution = bfsps.getPath();
+		assertTrue(dsolution == null && assolution == null && bfsolution == null);
+	}
+	
+	@Test
+	public void testInfeasibleLength() {
+		ShortestPathData spd = new ShortestPathData(graph3, graph3.get(7449), graph3.get(8975), ArcInspectorFactory.getAllFilters().get(1));
+		ShortestPathSolution dsps = new DijkstraAlgorithm(spd).doRun();
+		ShortestPathSolution assps = new AStarAlgorithm(spd).doRun();
+		ShortestPathSolution bfsps = new BellmanFordAlgorithm(spd).doRun();
+		assertTrue(bfsps.getStatus() == AbstractSolution.Status.INFEASIBLE);
+		assertTrue(dsps.getStatus() == AbstractSolution.Status.INFEASIBLE);
+		assertTrue(assps.getStatus() == AbstractSolution.Status.INFEASIBLE); 
+	}
+
+	@Test
+	public void testInfeasibleTime() {
+		ShortestPathData spd = new ShortestPathData(graph3, graph3.get(7449), graph3.get(8975), ArcInspectorFactory.getAllFilters().get(3));
+		ShortestPathSolution dsps = new DijkstraAlgorithm(spd).doRun();
+		ShortestPathSolution assps = new AStarAlgorithm(spd).doRun();
+		ShortestPathSolution bfsps = new BellmanFordAlgorithm(spd).doRun();
+		assertTrue(bfsps.getStatus() == AbstractSolution.Status.INFEASIBLE);
+		assertTrue(dsps.getStatus() == AbstractSolution.Status.INFEASIBLE);
+		assertTrue(assps.getStatus() == AbstractSolution.Status.INFEASIBLE);		
+	}
 }

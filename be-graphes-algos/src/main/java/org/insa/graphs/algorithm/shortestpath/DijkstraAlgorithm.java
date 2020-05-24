@@ -43,6 +43,9 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         	
         	for (Arc arc : currentNode.getSuccessors()) {
         		
+        		if (!data.isAllowed(arc))
+        			continue;
+        		
         		if(labelList[arc.getDestination().getId()] == null) 
         		{
         			Label x = this.CreateLabel(arc.getDestination(), false, labelList[currentNode.getId()].getCost() + data.getCost(arc), arc, data);
@@ -67,7 +70,12 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         }
     
         //construct solution
-        if (labelList[data.getDestination().getId()].getPredecessor() == null) {
+        try {
+        	if (labelList[data.getDestination().getId()].getPredecessor() == null) {
+        		return new ShortestPathSolution(data, Status.INFEASIBLE);
+        	}
+        }
+        catch (NullPointerException exception) {
         	return new ShortestPathSolution(data, Status.INFEASIBLE);
         }
         
