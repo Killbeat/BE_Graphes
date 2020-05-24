@@ -1,14 +1,8 @@
 package org.insa.graphs.algorithm.shortestpath;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-import org.insa.graphs.algorithm.AbstractSolution.Status;
-import org.insa.graphs.algorithm.utils.BinaryHeap;
+import org.insa.graphs.algorithm.AbstractInputData;
 import org.insa.graphs.model.Arc;
-import org.insa.graphs.model.Graph;
 import org.insa.graphs.model.Node;
-import org.insa.graphs.model.Path;
 import org.insa.graphs.model.Point;
 
 public class AStarAlgorithm extends DijkstraAlgorithm {
@@ -18,7 +12,27 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
     }
   
     @Override
-    protected LabelStar CreateLabel(Node n, boolean costknown, float cost, Arc parent, Node dest) {
-    	return new LabelStar(n, costknown, cost, parent, (float)Point.distance(n.getPoint(), dest.getPoint()));
+    protected LabelStar CreateLabel(Node n, boolean costknown, double cost, Arc parent, ShortestPathData data) {
+    	if (data.getMode() == AbstractInputData.Mode.LENGTH)
+    		return new LabelStar(n, costknown, cost, parent, (float)Point.distance(n.getPoint(), data.getDestination().getPoint()));
+    	else if (data.getMode() == AbstractInputData.Mode.TIME)
+    	{
+    		int graph_speed = data.getGraph().getGraphInformation().getMaximumSpeed();
+    		int data_speed = data.getMaximumSpeed();
+    		int speed = 0;
+    		double ec = 0;
+    		if (graph_speed == -1 && data_speed == -1) 
+    			speed = 130; 
+    		else if (graph_speed == -1)
+    			speed = data_speed;
+    		else if (data_speed == -1)
+    			speed = graph_speed;
+    		else 
+    			speed = Math.min(graph_speed, data_speed);
+    		
+    		ec = 3.6 * n.getPoint().distanceTo(data.getDestination().getPoint())/(double)speed;
+    		return new LabelStar(n, costknown, cost, parent, ec);
+    	} else
+    		return null;
     }
 }

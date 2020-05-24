@@ -9,11 +9,11 @@ class Label implements Comparable<Label> {
 	// is the min cost known by the algorithm already ?
 	private boolean costKnown;
 	// current cost from start node to this one
-	protected float cost;
+	protected double cost;
 	// precedent arc corresponding to shortest path from start node
 	private Arc predecessor;
 	
-	public Label(Node sc, boolean m, float c, Arc p) {
+	public Label(Node sc, boolean m, double c, Arc p) {
 		this.currentNode = sc;
 		this.costKnown = m;
 		this.cost = c;
@@ -22,7 +22,7 @@ class Label implements Comparable<Label> {
 	
 	// getters setters
 	
-	public float getCost() {
+	public double getCost() {
 		return this.cost;
 	}
 	
@@ -34,7 +34,7 @@ class Label implements Comparable<Label> {
 		return this.costKnown;
 	}
 	
-	public void setCost(float cost) {
+	public void setCost(double cost) {
 		this.cost = cost;
 	}
 	
@@ -50,7 +50,7 @@ class Label implements Comparable<Label> {
 		return this.predecessor;
 	}
 	
-	public float getTotalCost() {
+	public double getTotalCost() {
 		return this.cost;
 	}
 	
@@ -58,10 +58,10 @@ class Label implements Comparable<Label> {
 	public int compareTo(Label otherLabel) {
 		if (this.getTotalCost() < otherLabel.getTotalCost()) {
 			return -1;
-		} else if (this.getTotalCost() == otherLabel.getTotalCost()) {
-			return 0;
-		} else {
+		} else if (this.getTotalCost() > otherLabel.getTotalCost()) {
 			return 1;
+		} else {
+			return 0;
 		}
 	}
 	
